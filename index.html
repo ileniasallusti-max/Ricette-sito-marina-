@@ -349,7 +349,7 @@ function advice(r){
   const dP=tP-r.p;
   if(dP>=5){const s=protSource(r);const g=Math.min(150,r5(Math.min(dP,20)/s.p*100));addK+=g*s.k/100;tips.push(`<i>+${g} g</i><span>di ${s.name}: circa +${Math.round(g*s.p/100)} g di proteine</span>`)}
   const dK=tK-r.kcal-addK;
-  if(dK>=100){const s=carbSource(r);const g=Math.min(s.k>200?40:120,r5(Math.min(dK,150)/s.k*100));tips.push(`<i>+${g} g</i><span>di ${s.name}: circa +${Math.round(g*s.k/100)} kcal di energia</span>`)}
+  if(dK>=200){const s=carbSource(r);const g=Math.min(s.k>200?20:80,r5(Math.min(dK,80)/s.k*100));tips.push(`<i>+${g} g</i><span>di ${s.name}: circa +${Math.round(g*s.k/100)} kcal di energia</span>`)}
   return {tP,tK,tips,over:r.kcal-tK};
 }
 
@@ -580,7 +580,7 @@ function bindForm(onOk){
 function resultHtml(p){const pl=plan(p);
   return `<div class="res"><section class="card big"><small>Il tuo fabbisogno giornaliero</small><b class="num">${pl.kcal} kcal</b><span>per costruire massa sui glutei con un piccolo surplus</span></section>
    <section class="card macros"><div class="mgrid"><div class="m" style="--c:var(--prot)"><small>Proteine</small><b>${pl.prot}<span> g</span></b></div><div class="m" style="--c:var(--carb)"><small>Carboidrati</small><b>${pl.carb}<span> g</span></b></div><div class="m" style="--c:var(--fat)"><small>Grassi</small><b>${pl.fat}<span> g</span></b></div></div></section>
-   <p class="note">Le proteine sono calcolate a 1,8 g per kg di peso, la quantità che serve per far crescere il muscolo. Le calorie partono dal tuo metabolismo e dai tuoi allenamenti, più circa 200 kcal di surplus. Sono indicazioni generali: non sostituiscono il parere di un nutrizionista o di un medico.</p></div>`}
+   <p class="note">Le proteine sono calcolate a 1,8 g per kg di peso, la quantità che serve per far crescere il muscolo. Le calorie partono dal tuo metabolismo e dai tuoi allenamenti, più circa 200 kcal di surplus.</p></div>`}
 function showOnboarding(){
   const O=$("#onb");
   O.innerHTML=`<div class="wrap"><section class="onb-hero"><div class="eyebrow">Benvenuta</div><h1>Creiamo il tuo piano</h1><p>Con pochi dati calcolo quante proteine e quanta energia ti servono. Ogni ricetta poi ti dirà se va bene così o cosa aggiungere.</p></section>${profileForm()}<p class="hint-s">I tuoi dati restano solo su questo telefono.</p></div>`;
