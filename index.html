@@ -193,6 +193,11 @@ button.quick .qi{background:rgba(255,255,255,.22)!important;color:#fff!important
 .exlog{padding:9px 8px!important;border-radius:12px!important;gap:3px!important}
 .exlog .lb{font-size:12.5px!important;white-space:normal!important;line-height:1.2}
 .exlog small{font-size:11.5px!important;white-space:normal!important;line-height:1.25}
+.exc{grid-template-rows:auto auto;align-content:start}
+.exv .et{min-height:2.5em!important;line-height:1.25!important;font-size:12.5px!important}
+.exlog{padding:6px 8px!important;border-radius:10px!important;gap:1px!important;box-shadow:none!important}
+.exlog .lb{font-size:12px!important;white-space:nowrap!important;gap:5px!important}.exlog .lb svg{width:12px;height:12px}
+.exlog small{font-size:10.5px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
@@ -549,7 +554,10 @@ const svg=(p,s=22)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="n
 /* ---------- dati personali (solo su questo telefono) ---------- */
 const KEY="ricetteFit.v1";
 let S=(()=>{try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.log)return d}catch(e){}return{profile:null,log:{},shop:{done:{},extra:[],hide:{}},vdone:{}}})();
-S.shop=S.shop||{done:{},extra:[],hide:{}}; S.vdone=S.vdone||{}; S.vt=S.vt||{}; if(S.profile&&!S.start){S.start=dk();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S.shop=S.shop||{done:{},extra:[],hide:{}}; S.vdone=S.vdone||{}; S.vt=S.vt||{};
+const LV={base:{name:"Base",freq:"2 allenamenti a settimana"},intermedio:{name:"Intermedio",freq:"3 allenamenti a settimana"},avanzato:{name:"Avanzato",freq:"3 allenamenti a settimana"}};
+(()=>{try{const u=new URL(location.href);let l=(u.searchParams.get("livello")||"").toLowerCase();l={principiante:"base",medio:"intermedio"}[l]||l;
+  if(LV[l]){S.level=l;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}u.searchParams.delete("livello");history.replaceState(null,"",u.pathname+u.search+u.hash)}}catch(e){}})(); if(S.profile&&!S.start){S.start=dk();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const dayLog=(k=dk())=>{const l=S.log[k]||(S.log[k]={meals:[],workouts:[]});l.extra=l.extra||[];l.gym=l.gym||[];l.hab=l.hab||{w:0};return l};
 const hasFood=l=>!!l&&((l.meals||[]).length+(l.extra||[]).length>0);
@@ -721,7 +729,6 @@ const maxKg=e=>Math.max(0,...e.sets.map(x=>+x.kg||0));
 function allExercises(){const m={};Object.keys(S.log).sort().forEach(k=>(S.log[k].gym||[]).forEach(e=>{if(!e.sets.some(x=>x.r||x.kg))return;const n=e.name.trim(),key=n.toLowerCase();const it=m[key]||(m[key]={name:n,times:0,best:0,last:null,first:null});it.times++;it.best=Math.max(it.best,maxKg(e));it.last={k,e};if(!it.first)it.first={k,e}}));return Object.values(m).sort((a,b)=>b.last.k.localeCompare(a.last.k))}
 const shortDate=k=>new Date(k+"T12:00").toLocaleDateString("it-IT",{day:"numeric",month:"short"});
 const PROG=()=>WORKOUTS.flatMap(g=>g.items).filter(v=>v.ex);
-const PROGRAM_PDF="programma.pdf";
 const vtitle=v=>(S.vt&&S.vt[v.id])||v.title;
 function loadTitles(){S.vt=S.vt||{};if(window._vtl)return;window._vtl=1;
   WORKOUTS.flatMap(g=>g.items).forEach(v=>{if(S.vt[v.id])return;fetch("https://noembed.com/embed?url="+encodeURIComponent(v.url)).then(r=>r.json()).then(j=>{if(j&&j.title){S.vt[v.id]=j.title;save();document.querySelectorAll(`[data-vt="${v.id}"]`).forEach(x=>x.textContent=j.title)}}).catch(()=>{})})}
@@ -734,9 +741,11 @@ function showTrain(){
   const others=L.gym.filter(e=>!PROG().some(v=>e.key===v.id||e.name.trim().toLowerCase()===v.ex.toLowerCase()||e.name.trim()===vtitle(v)));
   openPage(`<div class="hdr">${back("p1")}<h2></h2></div>
    <h1 class="f-title">Allenamenti</h1>
-   <a class="prg" href="${PROGRAM_PDF}" target="_blank" rel="noopener" download><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
-    <span class="pg-tx"><small>6 settimane · glutei</small><b>Il tuo programma</b><em>Tocca per scaricarlo</em></span>
-    <span class="pg-dl">${svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',22)}</span></a>
+   ${S.level&&LV[S.level]?`<a class="prg" href="programma-${S.level}.pdf" target="_blank" rel="noopener" download="Sexy-Glutes-Programma-${LV[S.level].name}.pdf"><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
+    <span class="pg-tx"><small>Livello ${LV[S.level].name} · ${LV[S.level].freq}</small><b>Il tuo programma</b><em>Tocca per scaricarlo</em></span>
+    <span class="pg-dl">${svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',22)}</span></a>`
+    :`<div class="prg"><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
+    <span class="pg-tx"><small>6 settimane · glutei</small><b>Il tuo programma</b><em>Fai il quiz e tocca "Vai al sito": qui comparirà il programma del tuo livello</em></span></div>`}
    <p class="f-sub" style="margin-top:16px">Guarda la spiegazione di ogni esercizio e segna sotto il tuo carico.</p>
    ${hasTrain(L)?`<a class="btn wide tgb" style="margin-top:10px" href="${TG}" target="_blank" rel="noopener">${TGI} Com'è andato? Raccontalo nel gruppo</a>`:""}
    ${warm.length?`<div class="sec" style="margin-top:18px"><h3>Riscaldamento</h3></div>
@@ -744,7 +753,7 @@ function showTrain(){
    ${[["entrambi","In palestra e a casa",DUMB],["casa","Solo a casa",'<path d="M3 11 12 4l9 7v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>']].map(([pl,lab,ic])=>{const vs=PROG().filter(v=>(v.place||"entrambi")===pl);return vs.length?`<div class="hs" style="margin-top:22px"><span class="hsi lil">${svg(ic,16)}</span><h3>${lab}</h3><span class="hr">${vs.length} ${vs.length===1?"esercizio":"esercizi"}</span></div>
    <div class="exgrid">${vs.map(v=>{const te=todayEx(v),h=exEntries(v,dk());
      return `<div class="exc"><button class="exv" data-vid="${v.id}">${thumb(v,"h")}<span class="et" data-vt="${v.id}">${esc(vtitle(v))}</span></button>
-      <button class="exlog ${te?"on":""}" data-gymv="${v.id}"><span class="lb">${svg('<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',14)}${te?"Carico di oggi":"Inserisci il carico di oggi"}</span>${te&&setsSummary(te)?`<small class="num">${setsSummary(te)}</small>`:h.length?`<small class="num">Ultima volta: ${setsSummary(h[0].e)}</small>`:`<small>Serie, ripetizioni e kg</small>`}</button></div>`}).join("")}</div>`:""}).join("")}
+      <button class="exlog ${te?"on":""}" data-gymv="${v.id}"><span class="lb">${svg('<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',14)}${te?"Carico di oggi":"Inserisci carico"}</span>${te&&setsSummary(te)?`<small class="num">${setsSummary(te)}</small>`:h.length?`<small class="num">Ultima volta: ${setsSummary(h[0].e)}</small>`:`<small>Serie, ripetizioni e kg</small>`}</button></div>`}).join("")}</div>`:""}).join("")}
    ${others.length?`<div class="exl card" style="margin-top:12px">${others.map(e=>{const dn=e.sets.filter(x=>x.done).length;return `<button class="gx ex today" data-gym="${e.id}"><span class="gi">${svg(DUMB)}</span><span class="tx"><b>${esc(e.name)}</b><small class="num">${setsSummary(e)||"Nessuna serie segnata"}</small></span><span class="gd num ${dn&&dn===e.sets.length?"ok":""}">${dn}/${e.sets.length}</span></button>`}).join("")}</div>`:""}
    <button class="add-gx small" data-gym="">+ Un altro esercizio</button>
 
@@ -961,6 +970,7 @@ function readForm(){
   if(!(p.h>=130&&p.h<=210)) return [null,"Inserisci l'altezza in centimetri, per esempio 165."];
   if(!(p.w>=35&&p.w<=180)) return [null,"Inserisci il peso in chili, per esempio 58."];
   if(!p.act) return [null,"Scegli quanti allenamenti fai a settimana."];
+
   return [p,""];
 }
 function bindForm(onOk){
@@ -982,7 +992,7 @@ function showMe(){
   setTab("me"); cur=null;
   const p=S.profile;
   openPage(`<div class="hdr">${back("p1")}<h2></h2></div>
-   <h1 class="f-title">${p?esc(p.name):"Il tuo profilo"}</h1><p class="f-sub">${p?`${p.age} anni · ${p.h} cm · ${p.w} kg · ${ACT.find(a=>a.id===p.act).txt} a settimana`:"Inserisci i tuoi dati per il piano personalizzato."}</p>
+   <h1 class="f-title">${p?esc(p.name):"Il tuo profilo"}</h1><p class="f-sub">${p?`${p.age} anni · ${p.h} cm · ${p.w} kg · ${ACT.find(a=>a.id===p.act).txt} a settimana${S.level&&LV[S.level]?" · livello "+LV[S.level].name:""}`:"Inserisci i tuoi dati per il piano personalizzato."}</p>
    ${p?resultHtml(p):""}
    <div class="sec"><h3>${p?"Aggiorna i tuoi dati":"I tuoi dati"}</h3></div>
    ${profileForm(p||{},p?"Aggiorna il piano":"Calcola il mio piano")}
