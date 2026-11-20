@@ -240,6 +240,35 @@ button.quick .qi{background:rgba(255,255,255,.22)!important;color:#fff!important
 .prog .ex .v{justify-self:start;font-weight:800;font-size:15px;background:var(--tint);color:var(--lilac-deep);border-radius:10px;padding:6px 10px}
 .prog .ex .r{font-size:13px;color:var(--muted);font-weight:600;align-self:center;text-align:right}
 .prog .tip{margin-top:10px;background:var(--tint);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.45}
+.prog p,.prog li{font-size:13.5px!important;line-height:1.5}
+.prog h1{font-size:24px!important}.prog h2{font-size:19px!important}.prog h3{font-size:14.5px!important;margin:14px 0 3px!important}
+.prog .hero{padding:14px 16px!important}
+.prog .pp+.pp{border-top:0!important;padding-top:0!important;margin-top:26px!important}
+.prog .dayh{margin-bottom:8px!important}.prog .dayh .n{font-size:21px!important}.prog .dayh .small{font-size:12px!important}
+.prog .ex{grid-template-columns:118px 1fr!important;grid-template-areas:"f n" "f v" "f r";gap:4px 12px!important;align-items:center;background:var(--soft);border:1px solid var(--line)!important;border-radius:16px;padding:10px!important;margin-bottom:8px}
+.prog .ex .pair{grid-area:f!important;max-width:none!important;padding:2px 4px!important;border-radius:12px;align-self:stretch}
+.prog .ex .pair .ar{font-size:10px}
+.prog .ex .nm{grid-area:n!important}.prog .ex .nm b{font-size:14.5px!important;line-height:1.25}.prog .ex .nm i{display:none}
+.prog .ex .nm small{font-size:11.5px!important;margin-top:2px!important;line-height:1.35}
+.prog .ex .v{grid-area:v;font-size:12.5px!important;padding:3px 9px!important;border-radius:99px!important;line-height:1.3}
+.prog .ex .r{grid-area:r;text-align:left!important;font-size:11.5px!important}.prog .ex .r::before{content:"⏱ Recupero: "}
+.prog .warm{grid-template-columns:118px 1fr;align-items:center;gap:12px!important;background:var(--soft);border:1px solid var(--line)!important;border-radius:16px;padding:10px!important;margin-bottom:8px}
+.prog .warm b{font-size:14.5px!important}.prog .warm .small{font-size:11.5px!important}
+.prog .tip{font-size:12px!important}
+.pdfl{display:flex;align-items:center;justify-content:center;gap:8px;margin:22px 0 8px;padding:13px;border-radius:14px;background:var(--tint);color:var(--lilac-deep);font-weight:700;font-size:14.5px;text-decoration:none}
+.prog .ex .pair{align-self:center!important;padding:4px!important}
+.prog .ex,.prog .warm{grid-template-columns:132px 1fr!important}
+.prog .warm .pair{padding:4px!important}
+.prog .warm>div>span{font-size:13px;font-weight:700!important;color:var(--lilac-deep)}
+.ptop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 12px}
+.ptop small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#C96A85}
+.ptop b{font-family:var(--display);font-size:22px}
+.ptop .pdfl{margin:0!important;padding:10px 14px!important;background:var(--lilac-deep)!important;color:#fff!important;font-size:13.5px!important;flex:none}
+.ptabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;margin:0 -16px 4px;padding-left:16px;padding-right:16px;scrollbar-width:none;position:sticky;top:0;z-index:2;background:var(--bg)}
+.ptabs::-webkit-scrollbar{display:none}
+.ptabs button{flex:none;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:99px;padding:8px 14px;font:700 13px var(--body);cursor:pointer}
+.ptabs button.on{background:var(--lilac-deep);border-color:var(--lilac-deep);color:#fff}
+.prog .pp:first-child{margin-top:4px!important}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
@@ -779,11 +808,19 @@ function loadTitles(){S.vt=S.vt||{};if(window._vtl)return;window._vtl=1;
 function exEntries(v,skip){const out=[];Object.keys(S.log).sort().reverse().forEach(k=>{if(k===skip)return;(S.log[k].gym||[]).forEach(e=>{if((e.key===v.id||e.name.trim().toLowerCase()===v.ex.toLowerCase()||e.name.trim()===vtitle(v))&&e.sets.some(x=>x.r||x.kg))out.push({k,e})})});return out}
 const todayEx=v=>dayLog().gym.find(e=>e.key===v.id||e.name.trim().toLowerCase()===v.ex.toLowerCase()||e.name.trim()===vtitle(v));
 function thumb(v,cls=""){const id=ytId(v.url),sh=/shorts\//.test(v.url),src=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`;return `<span class="tb ${sh?"sh":"wd"} ${cls}">${id?(sh?`<img class="bgb" src="${src}" alt="" loading="lazy" onerror="this.remove()"><span class="sc"><img src="${src}" alt="" loading="lazy" onerror="this.remove()"></span>`:`<img src="${src}" alt="" loading="lazy" onerror="this.remove()">`):""}<span class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8Z"/></svg></span></span>`}
-function showProgram(){
+function showProgram(tab){
   const l=S.level; if(!l||!PROGHTML[l]) return;
+  const tmp=document.createElement("div"); tmp.innerHTML=PROGHTML[l];
+  const secs=[...tmp.querySelectorAll(".pp")].map(x=>x.innerHTML);
+  const labs=secs.map((_,i)=>i===0?"Come funziona":i===1?"Riscaldamento":"Giorno "+(i-1));
+  if(tab===undefined) tab=(S.progTab!=null&&S.progTab<secs.length)?S.progTab:2;
+  S.progTab=tab; save();
   openPage(`<div class="hdr">${back("p2")}<h2></h2></div>
-   <div class="prog">${PROGHTML[l]}
-   <a class="btn wide" style="margin-top:14px" href="programma-${l}.pdf" target="_blank" rel="noopener" data-pdf>Apri anche come PDF</a></div>`,"p2");
+   <div class="ptop"><div><small>Livello ${LV[l].name}</small><b>Il tuo programma</b></div>
+    <a class="pdfl" href="programma-${l}.pdf" target="_blank" rel="noopener" data-pdf>${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',16)} Apri PDF</a></div>
+   <div class="ptabs">${labs.map((t,i)=>`<button class="${i===tab?"on":""}" data-ptab="${i}">${t}</button>`).join("")}</div>
+   <div class="prog"><section class="pp">${secs[tab]}</section></div>`,"p2");
+  const on=document.querySelector(".ptabs .on"); if(on) on.scrollIntoView({inline:"center",block:"nearest"});
 }
 function showTrain(){
   setTab("train"); cur=null; loadTitles();
@@ -1071,6 +1108,7 @@ document.addEventListener("click",e=>{
   const d=t.dataset;
   if("gym" in d)showGym(d.gym||null);
   else if("prog" in d){showProgram()}
+  else if(d.ptab!==undefined){showProgram(+d.ptab);const p2=document.querySelector("#p2");if(p2)p2.scrollTo(0,0)}
   else if(d.gymv){const v=PROG().find(x=>x.id===d.gymv);const te=todayEx(v);showGym(te?te.id:null,vtitle(v),v.id)}
   else if(d.gymn){const te=dayLog().gym.find(e=>e.name.trim().toLowerCase()===d.gymn.toLowerCase());showGym(te?te.id:null,d.gymn)}
   else if("extra" in d)showExtra();
