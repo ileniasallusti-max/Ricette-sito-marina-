@@ -748,8 +748,8 @@ function showTrain(){
   const others=L.gym.filter(e=>!PROG().some(v=>e.key===v.id||e.name.trim().toLowerCase()===v.ex.toLowerCase()||e.name.trim()===vtitle(v)));
   openPage(`<div class="hdr">${back("p1")}<h2></h2></div>
    <h1 class="f-title">Allenamenti</h1>
-   ${S.level&&LV[S.level]?`<a class="prg" href="programma-${S.level}.pdf" target="_blank" rel="noopener" download="Sexy-Glutes-Programma-${LV[S.level].name}.pdf"><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
-    <span class="pg-tx"><small>Livello ${LV[S.level].name} · ${LV[S.level].freq}</small><b>Il tuo programma</b><em>Tocca per scaricarlo</em></span>
+   ${S.level&&LV[S.level]?`<a class="prg" href="programma-${S.level}.pdf" target="_blank" rel="noopener" data-pdf><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
+    <span class="pg-tx"><small>Livello ${LV[S.level].name} · ${LV[S.level].freq}</small><b>Il tuo programma</b><em>Tocca per aprirlo</em></span>
     <span class="pg-dl">${svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',22)}</span></a>`
     :`<div class="prg"><span class="pg-ic">${svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',26)}<i>PDF</i></span>
     <span class="pg-tx"><small>6 settimane · glutei</small><b>Il tuo programma</b><em>Fai il quiz e tocca "Vai al sito": qui comparirà il programma del tuo livello</em></span></div>`}
@@ -1034,6 +1034,10 @@ document.addEventListener("click",e=>{
   else if(d.go){$("#p2").hidden=true;
     if(d.go==="home")closeLayer("p1");else if(d.go==="shop")showShop();else if(d.go==="train")showTrain();else if(d.go==="streak")showStreak();else if(d.go==="me")showMe()}
 });
+document.addEventListener("click",e=>{const a=e.target.closest("a[data-pdf]");if(!a)return;
+  const url=new URL(a.getAttribute("href"),location.href).href;
+  if(window.navigator.standalone||matchMedia("(display-mode: standalone)").matches){e.preventDefault();const w=window.open(url,"_blank");if(!w)location.assign(url)}
+},true);
 renderHome();
 if(!S.profile) showOnboarding();
 let _sl=slot()+dk();setInterval(()=>{const k=slot()+dk();if(k!==_sl){_sl=k;if($("#p1").hidden)renderHome()}},60000);
